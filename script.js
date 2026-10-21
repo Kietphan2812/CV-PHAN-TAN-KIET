@@ -240,31 +240,72 @@ function initAvatar3DTilt() {
 }
 
 /* ==========================================================================
-   5. Photo Switcher & Avatar Lightbox
+   5. Photo Switcher & Avatar Lightbox (Tự Động Luân Chuyển 2 Ảnh)
    ========================================================================== */
 function initPhotoSwitcher() {
   const mainImg = document.getElementById('main-avatar-img');
-  const thumbBtns = document.querySelectorAll('.photo-thumb-btn');
+  const thumbBtns = Array.from(document.querySelectorAll('.photo-thumb-btn'));
   const avatarTrigger = document.getElementById('avatar-frame-trigger');
+  const avatarCard = document.getElementById('avatar-card');
 
-  if (!mainImg) return;
+  if (!mainImg || thumbBtns.length === 0) return;
 
-  thumbBtns.forEach((btn) => {
+  let currentIndex = 0;
+  let autoSlideTimer = null;
+
+  function switchPhoto(index) {
+    if (index < 0 || index >= thumbBtns.length) return;
+    currentIndex = index;
+    const btn = thumbBtns[index];
+    const targetSrc = btn.getAttribute('data-img');
+    if (!targetSrc) return;
+
+    mainImg.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+    mainImg.style.opacity = '0';
+    mainImg.style.transform = 'scale(0.97)';
+
+    setTimeout(() => {
+      mainImg.src = targetSrc;
+      mainImg.style.opacity = '1';
+      mainImg.style.transform = 'scale(1)';
+    }, 250);
+
+    thumbBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function startAutoSlide() {
+    stopAutoSlide();
+    autoSlideTimer = setInterval(() => {
+      const nextIndex = (currentIndex + 1) % thumbBtns.length;
+      switchPhoto(nextIndex);
+    }, 3500); // Tự động đổi ảnh mỗi 3.5 giây
+  }
+
+  function stopAutoSlide() {
+    if (autoSlideTimer) {
+      clearInterval(autoSlideTimer);
+      autoSlideTimer = null;
+    }
+  }
+
+  // Click chọn thủ công
+  thumbBtns.forEach((btn, idx) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const targetSrc = btn.getAttribute('data-img');
-      if (targetSrc) {
-        mainImg.style.opacity = '0';
-        setTimeout(() => {
-          mainImg.src = targetSrc;
-          mainImg.style.opacity = '1';
-        }, 150);
-
-        thumbBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      }
+      switchPhoto(idx);
+      startAutoSlide(); // Khởi động lại đếm giờ
     });
   });
+
+  // Tạm dừng khi rê chuột vào xem, tiếp tục khi rê ra ngoài
+  if (avatarCard) {
+    avatarCard.addEventListener('mouseenter', stopAutoSlide);
+    avatarCard.addEventListener('mouseleave', startAutoSlide);
+  }
+
+  // Bắt đầu tự động chuyển ảnh
+  startAutoSlide();
 
   // Avatar click opens larger preview
   if (avatarTrigger) {
