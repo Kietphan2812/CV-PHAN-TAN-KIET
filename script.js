@@ -418,6 +418,49 @@ const projectDetailsData = {
         </div>
       </div>
     `
+  },
+  tienganh: {
+    title: "Dự Án 4: Học Tập Về Tiếng Anh (Bộ Đôi 2 Website)",
+    badge: "Dự Án Cá Nhân • EdTech Tool",
+    html: `
+      <div style="line-height: 1.7; color: var(--text-main);">
+        <p style="margin-bottom: 16px;">
+          <strong>Ý tưởng & Mục tiêu:</strong> Xây dựng bộ công cụ học tập tiếng Anh trực quan phục vụ ôn tập chuẩn đầu ra đại học cho bản thân và bạn bè, chia làm 2 hệ thống web độc lập phục vụ 2 mục đích riêng biệt.
+        </p>
+
+        <h4 style="color: var(--emerald-light); font-size: 1.05rem; margin-bottom: 12px;">Chi Tiết 2 Nền Tảng Trực Tuyến:</h4>
+
+        <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
+          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <span style="font-weight: 800; color: #ffffff;">Link 1: Tiếng Anh Đầu Ra PTK</span>
+              <span style="font-size: 0.75rem; background: var(--grad-emerald); color: #fff; padding: 2px 8px; border-radius: 4px; font-weight: 700;">Luyện Đề Thi</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 10px;">
+              Hệ thống ôn luyện đề thi trắc nghiệm, bấm giờ làm bài, giải thích đáp án và theo dõi tiến độ chuẩn đầu ra tốt nghiệp đại học.
+            </p>
+            <a href="https://tieng-anh-dau-ra-ptk.onrender.com" target="_blank" rel="noopener noreferrer" class="btn-primary" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; font-size: 0.82rem;">
+              <span>Mở Web Tiếng Anh Đầu Ra</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+
+          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <span style="font-weight: 800; color: #ffffff;">Link 2: Học Từ Vựng Tiếng Anh</span>
+              <span style="font-size: 0.75rem; background: rgba(255,255,255,0.1); color: var(--emerald-light); border: 1px solid rgba(16,185,129,0.3); padding: 2px 8px; border-radius: 4px; font-weight: 700;">Từ Vựng Flashcards</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 10px;">
+              Học từ vựng qua thẻ Flashcard thông minh 2 mặt, tra nghĩa, ví dụ câu ngữ cảnh và phát âm bản xứ với Audio Web API.
+            </p>
+            <a href="https://tuvungtienganh-1.onrender.com" target="_blank" rel="noopener noreferrer" class="btn-primary" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; font-size: 0.82rem; background: var(--bg-card-hover); border: 1px solid var(--emerald-light);">
+              <span>Mở Web Học Từ Vựng</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    `
   }
 };
 

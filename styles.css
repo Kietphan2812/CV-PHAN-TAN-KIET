@@ -1370,6 +1370,135 @@ section {
   color: var(--emerald-light);
 }
 
+/* Dual Actions for Projects with 2 Links */
+.project-actions.dual-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.project-actions.dual-actions .btn-project-link,
+.project-actions.dual-actions .btn-project-link-sub {
+  flex: 1 1 calc(50% - 26px);
+  min-width: 125px;
+}
+
+.project-actions.dual-actions .btn-project-secondary {
+  flex: 0 0 38px;
+}
+
+.btn-project-link-sub {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  border-radius: var(--border-radius-sm);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: var(--emerald-light);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.btn-project-link-sub:hover {
+  background: rgba(16, 185, 129, 0.24);
+  border-color: var(--emerald-ultra);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
+}
+
+/* Project Live Links Box (Dual Links) */
+.project-live-links-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--border-radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.live-link-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.live-link-num {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: var(--grad-emerald);
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.live-link-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.live-link-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.live-link-url {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--emerald-light);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  word-break: break-all;
+  transition: color var(--transition-fast);
+}
+
+.live-link-url:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.screen-preview-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.screen-sub-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--emerald-light);
+  background: rgba(0, 0, 0, 0.45);
+  padding: 3px 9px;
+  border-radius: 4px;
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.screen-sub-badge:hover {
+  background: rgba(16, 185, 129, 0.2);
+  color: #ffffff;
+}
+
 /* ==========================================================================
    Section 3: Skills Matrix (Kỹ năng & Năng lực)
    ========================================================================== */
