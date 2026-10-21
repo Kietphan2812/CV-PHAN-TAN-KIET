@@ -420,7 +420,7 @@ const projectDetailsData = {
     `
   },
   tienganh: {
-    title: "Dự Án 4: Học Tập Về Tiếng Anh (Bộ Đôi 2 Website)",
+    title: "Học Tập Về Tiếng Anh (Bộ Đôi 2 Website)",
     badge: "Dự Án Cá Nhân • EdTech Tool",
     html: `
       <div style="line-height: 1.7; color: var(--text-main);">

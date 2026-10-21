@@ -1412,67 +1412,7 @@ section {
   box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
 }
 
-/* Project Live Links Box (Dual Links) */
-.project-live-links-box {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  border-radius: var(--border-radius-sm);
-  padding: 12px 14px;
-  margin-bottom: 16px;
-}
 
-.live-link-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.live-link-num {
-  font-size: 0.7rem;
-  font-weight: 800;
-  padding: 3px 7px;
-  border-radius: 4px;
-  background: var(--grad-emerald);
-  color: #ffffff;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.live-link-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  flex: 1;
-}
-
-.live-link-name {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-.live-link-url {
-  font-size: 0.84rem;
-  font-weight: 700;
-  color: var(--emerald-light);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  word-break: break-all;
-  transition: color var(--transition-fast);
-}
-
-.live-link-url:hover {
-  color: #ffffff;
-  text-decoration: underline;
-}
 
 /* ==========================================================================
    Section 3: Skills Matrix (Kỹ năng & Năng lực)
