@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initPhotoSwitcher();
   initProjectFilters();
   initProjectModals();
+  initProjectLinkClicks();
   initTerminalInteractive();
   initScrollProgressBarAndBackToTop();
   initScrollRevealAndCounters();
@@ -424,7 +425,8 @@ function initCustomCursorAndRipples() {
     const explicit = target.getAttribute('data-cursor-text');
     if (explicit) return explicit;
 
-    if (target.closest('.project-card')) return 'XEM DỰ ÁN ↗';
+    if (target.closest('.btn-project-link, .btn-project-link-sub') || target.closest('a[target="_blank"]')) return 'MỞ WEBSITE ↗';
+    if (target.closest('.project-detail-btn')) return 'KIẾN TRÚC ℹ️';
     if (target.closest('.photo-thumb-btn') || target.closest('#avatar-frame-trigger')) return 'ĐỔI ẢNH 🔄';
     if (target.closest('.copy-mini-btn')) return 'COPY 📋';
     if (target.closest('#audio-toggle-btn')) return 'NHẠC NỀN 🎵';
@@ -433,7 +435,7 @@ function initCustomCursorAndRipples() {
     if (target.closest('#print-cv-btn') || target.closest('#btn-print-cv-header')) return 'IN CV 📄';
     if (target.closest('.terminal-window')) return 'TERMINAL ⚡';
     if (target.closest('.filter-btn')) return 'BỘ LỌC 📂';
-    if (target.closest('a[target="_blank"]')) return 'MỞ LINK ↗';
+    if (target.closest('.project-card')) return 'XEM DỰ ÁN ↗';
     return null;
   }
 
@@ -971,6 +973,23 @@ function openProjectModal(key, data) {
 }
 
 /* ==========================================================================
+   7b. Reliable External Link Click Dispatcher for Project Cards
+   ========================================================================== */
+function initProjectLinkClicks() {
+  const projectLinks = document.querySelectorAll('a.btn-project-link, a.btn-project-link-sub');
+  projectLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const href = link.getAttribute('href');
+      if (href && href !== '#' && !href.startsWith('javascript:')) {
+        window.open(href, '_blank', 'noopener,noreferrer');
+        e.preventDefault();
+      }
+    });
+  });
+}
+
+/* ==========================================================================
    8. Copy to Clipboard with Toast
    ========================================================================== */
 function initCopyButtons() {
@@ -1491,7 +1510,7 @@ function initMagneticButtons() {
   if (window.innerWidth < 992) return;
 
   const magneticTargets = document.querySelectorAll(
-    '.btn-primary, .btn-outline, .brand-logo, #theme-toggle-btn, #audio-toggle-btn, .back-to-top-btn, .photo-thumb-btn, .copy-mini-btn, .btn-project-link, .btn-project-secondary'
+    '.btn-primary, .btn-outline, .brand-logo, #theme-toggle-btn, #audio-toggle-btn, .back-to-top-btn, .photo-thumb-btn, .copy-mini-btn'
   );
 
   magneticTargets.forEach(el => {
