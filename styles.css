@@ -2281,6 +2281,514 @@ textarea.form-control {
 }
 
 /* ==========================================================================
+   SUPERCHARGED VISUAL EFFECTS & CYBER MOTION SUITE
+   - Reading Scroll Progress Bar
+   - Cyber Dual Cursor & Interactive Click Ripples
+   - Interactive Card Mouse Border Spotlight
+   - Holographic 3D Tilt Glare & Layer Depth
+   - Animated Skill Progress Shimmer
+   - Terminal Scanline & Live Pulse
+   - Flagship Radar Ping
+   - Floating Back to Top Button
+   - Scroll Reveal Animations
+   ========================================================================== */
+
+/* 1. Reading Scroll Progress Bar */
+.scroll-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, #10b981 0%, #00f5a0 35%, #06b6d4 70%, #3b82f6 100%);
+  box-shadow: 0 0 10px rgba(0, 245, 160, 0.8), 0 0 20px rgba(6, 182, 212, 0.5);
+  z-index: 1001;
+  transition: width 0.08s linear;
+}
+
+/* 2. Cyber Custom Cursor (Desktop Only) */
+.custom-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--emerald-ultra);
+  box-shadow: 0 0 10px var(--emerald-ultra), 0 0 20px rgba(0, 245, 160, 0.6);
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.2s ease;
+}
+
+.custom-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(52, 211, 153, 0.65);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+  pointer-events: none;
+  z-index: 99998;
+  transform: translate(-50%, -50%);
+  transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.25s ease,
+              background-color 0.25s ease,
+              box-shadow 0.25s ease,
+              opacity 0.2s ease;
+}
+
+body.cursor-hover .custom-cursor-ring {
+  width: 54px;
+  height: 54px;
+  border-color: var(--cyan-accent);
+  background-color: rgba(6, 182, 212, 0.08);
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+}
+
+.custom-cursor-ring.cursor-click {
+  transform: translate(-50%, -50%) scale(0.82);
+  border-color: var(--emerald-ultra);
+}
+
+@media (hover: none) or (pointer: coarse) {
+  .custom-cursor-dot,
+  .custom-cursor-ring {
+    display: none !important;
+  }
+}
+
+/* Click Shockwave Ripple & Sparks */
+.click-ripple {
+  position: fixed;
+  pointer-events: none;
+  z-index: 99990;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 245, 160, 0.8);
+  box-shadow: 0 0 16px rgba(0, 245, 160, 0.6);
+  transform: translate(-50%, -50%) scale(0);
+  animation: rippleExpand 0.6s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes rippleExpand {
+  0% {
+    width: 10px;
+    height: 10px;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.2);
+  }
+  100% {
+    width: 90px;
+    height: 90px;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.2);
+  }
+}
+
+.click-spark {
+  position: fixed;
+  pointer-events: none;
+  z-index: 99991;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--emerald-ultra);
+  box-shadow: 0 0 8px var(--emerald-ultra);
+}
+
+/* 3. Interactive Mouse Border Spotlight on Cards */
+.project-card,
+.skill-category-card,
+.timeline-card,
+.bio-card,
+.terminal-window,
+.hobby-card,
+.contact-info-card,
+.contact-form-card,
+.ai-spotlight-box {
+  position: relative;
+  isolation: isolate;
+}
+
+.project-card::after,
+.skill-category-card::after,
+.timeline-card::after,
+.bio-card::after,
+.terminal-window::after,
+.hobby-card::after,
+.contact-info-card::after,
+.contact-form-card::after,
+.ai-spotlight-box::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: radial-gradient(
+    380px circle at var(--mouse-x, -500px) var(--mouse-y, -500px),
+    rgba(0, 245, 160, 0.55),
+    rgba(6, 182, 212, 0.25),
+    transparent 65%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 20;
+}
+
+.project-card:hover::after,
+.skill-category-card:hover::after,
+.timeline-card:hover::after,
+.bio-card:hover::after,
+.terminal-window:hover::after,
+.hobby-card:hover::after,
+.contact-info-card:hover::after,
+.contact-form-card:hover::after,
+.ai-spotlight-box:hover::after {
+  opacity: 1;
+}
+
+/* 4. Holographic 3D Tilt Glare & Layer Depth */
+.avatar-3d-card {
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.card-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 15;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(
+    circle at var(--glare-x, 50%) var(--glare-y, 50%),
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(52, 211, 153, 0.15) 30%,
+    rgba(6, 182, 212, 0.08) 50%,
+    transparent 75%
+  );
+  mix-blend-mode: overlay;
+}
+
+.avatar-3d-card:hover .card-glare {
+  opacity: 1;
+}
+
+.avatar-frame {
+  transform: translateZ(42px);
+  transform-style: preserve-3d;
+  transition: transform var(--transition-normal);
+  background: conic-gradient(from 0deg, #10b981, #00f5a0, #06b6d4, #3b82f6, #10b981) !important;
+  animation: rotateConic 10s linear infinite;
+}
+
+@keyframes rotateConic {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+.avatar-tag {
+  transform: translateZ(50px);
+}
+
+.avatar-card-info {
+  transform: translateZ(32px);
+}
+
+.card-contact-list {
+  transform: translateZ(22px);
+}
+
+/* 5. 3D Tilt for Project Cards */
+.project-card {
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.project-card .project-banner {
+  transform: translateZ(20px);
+}
+
+.project-card .project-content {
+  transform: translateZ(15px);
+}
+
+/* 6. Flagship Badge Radar Ping */
+.flagship-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 25;
+}
+
+.flagship-badge::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  background: inherit;
+  opacity: 0.7;
+  z-index: -1;
+  animation: radarPing 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes radarPing {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  75%, 100% {
+    transform: scale(1.18, 1.45);
+    opacity: 0;
+  }
+}
+
+/* 7. Terminal Live Pulse & Scanline Overlay */
+.terminal-window {
+  position: relative;
+  overflow: hidden;
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.terminal-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.terminal-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--emerald-light);
+  letter-spacing: 0.05em;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.status-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--emerald-ultra);
+  box-shadow: 0 0 10px var(--emerald-ultra);
+  animation: terminalPulse 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes terminalPulse {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  100% { transform: scale(1.3); opacity: 1; }
+}
+
+.terminal-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: var(--emerald-light);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.terminal-copy-btn:hover {
+  background: var(--emerald-primary);
+  color: #ffffff;
+  border-color: var(--emerald-primary);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+.terminal-scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(180deg, transparent 50%, rgba(16, 185, 129, 0.035) 51%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* 8. Animated Skill Progress Bars & Continuous Shimmer Ray */
+.skill-progress-bar {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #059669 0%, #10b981 55%, #00f5a0 100%);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+  transition: width 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.skill-progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+  animation: skillShimmer 2.8s infinite;
+}
+
+@keyframes skillShimmer {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(250%); }
+}
+
+/* 9. Floating Back to Top Button with Circular Progress */
+.back-to-top-btn {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(13, 22, 34, 0.85);
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.25);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--emerald-light);
+  cursor: pointer;
+  z-index: 990;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px) scale(0.9);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.back-to-top-btn.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.back-to-top-btn:hover {
+  transform: translateY(-4px) scale(1.08);
+  border-color: var(--emerald-ultra);
+  color: #ffffff;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 245, 160, 0.5);
+}
+
+.progress-ring {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 44px;
+  height: 44px;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.progress-ring-bg {
+  stroke: rgba(255, 255, 255, 0.08);
+}
+
+.progress-ring-circle {
+  stroke: var(--emerald-ultra);
+  stroke-dasharray: 119.38;
+  stroke-dashoffset: 119.38;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.12s linear;
+}
+
+.arrow-icon {
+  position: relative;
+  z-index: 2;
+  transition: transform 0.25s ease;
+}
+
+.back-to-top-btn:hover .arrow-icon {
+  transform: translateY(-2px);
+}
+
+[data-theme="light"] .back-to-top-btn {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--emerald-dark);
+  border-color: rgba(16, 185, 129, 0.3);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), var(--glow-shadow);
+}
+
+[data-theme="light"] .progress-ring-bg {
+  stroke: rgba(0, 0, 0, 0.08);
+}
+
+/* 10. Scroll Reveal Animations */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(32px) scale(0.98);
+  filter: blur(4px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, filter;
+}
+
+.reveal-on-scroll.is-revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+/* 11. Subtle Button Magnetic Glow & Interactive Polish */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transition: left 0.6s ease;
+}
+
+.btn-primary:hover::after {
+  left: 100%;
+}
+
+.btn-outline:hover {
+  box-shadow: 0 0 20px rgba(52, 211, 153, 0.3);
+}
+
+.audio-toggle-btn.playing {
+  box-shadow: 0 0 22px rgba(0, 245, 160, 0.45);
+  border-color: var(--emerald-ultra);
+}
+
+/* ==========================================================================
    Print Styles: Clean A4 Output of the Original CV
    ========================================================================== */
 @media print {

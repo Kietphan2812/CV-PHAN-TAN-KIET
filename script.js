@@ -1,16 +1,22 @@
 /**
  * PHAN TẤN KIỆT (KIET PHAN) - INTERACTIVE PORTFOLIO & CV
- * Dynamic Motion, Particle Canvas, 3D Tilt, Audio Player, Project Filters, Modals & Toast
+ * Supercharged Motion Suite: Cosmic Constellation & Data Pulses, Cyber Cursor & Ripples,
+ * Mouse-Tracking Border Spotlight, Holographic 3D Tilt, Counter & Skill Animations
  */
 
 document.addEventListener('DOMContentLoaded', () => {
   initBackgroundCanvas();
-  initSpotlight();
+  initCustomCursorAndRipples();
+  initCardSpotlight();
   initTypingEffect();
   initAvatar3DTilt();
+  initProjectCards3DTilt();
   initPhotoSwitcher();
   initProjectFilters();
   initProjectModals();
+  initTerminalInteractive();
+  initScrollProgressBarAndBackToTop();
+  initScrollRevealAndCounters();
   initCopyButtons();
   initContactForm();
   initThemeToggle();
@@ -21,21 +27,26 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==========================================================================
-   1. Interactive Particle Constellation Canvas
+   1. Cosmic Constellation & Cyber Data Pulse Canvas
    ========================================================================== */
 function initBackgroundCanvas() {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   let width, height;
-  let particles = [];
-  const particleCount = window.innerWidth < 768 ? 32 : 65;
-  const maxDistance = 140;
+  let nodes = [];
+  let stars = [];
+  let dataPackets = [];
+
+  const isMobile = window.innerWidth < 768;
+  const nodeCount = isMobile ? 32 : 68;
+  const starCount = isMobile ? 25 : 55;
+  const maxDistance = isMobile ? 110 : 155;
 
   const mouse = {
     x: null,
     y: null,
-    radius: 130
+    radius: 160
   };
 
   function resize() {
@@ -45,7 +56,8 @@ function initBackgroundCanvas() {
 
   window.addEventListener('resize', () => {
     resize();
-    initParticles();
+    createStars();
+    createNodes();
   });
 
   window.addEventListener('mousemove', (e) => {
@@ -58,14 +70,45 @@ function initBackgroundCanvas() {
     mouse.y = null;
   });
 
-  class Particle {
+  // Layer 1: Distant Twinkling Cosmic Stars
+  class Star {
     constructor() {
       this.x = Math.random() * width;
       this.y = Math.random() * height;
-      this.vx = (Math.random() - 0.5) * 0.7;
-      this.vy = (Math.random() - 0.5) * 0.7;
-      this.size = Math.random() * 2 + 1;
-      this.baseColor = 'rgba(52, 211, 153, ';
+      this.size = Math.random() * 1.4 + 0.6;
+      this.baseAlpha = Math.random() * 0.45 + 0.2;
+      this.speed = Math.random() * 0.02 + 0.008;
+      this.phase = Math.random() * Math.PI * 2;
+    }
+
+    draw() {
+      this.phase += this.speed;
+      const alpha = this.baseAlpha + Math.sin(this.phase) * 0.2;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(167, 243, 208, ${Math.max(0.05, alpha)})`;
+      ctx.fill();
+    }
+  }
+
+  // Layer 2: Interactive Cyber Constellation Nodes
+  class ConstellationNode {
+    constructor() {
+      this.x = Math.random() * width;
+      this.y = Math.random() * height;
+      this.vx = (Math.random() - 0.5) * 0.75;
+      this.vy = (Math.random() - 0.5) * 0.75;
+      this.size = Math.random() * 2 + 1.2;
+      this.pulsePhase = Math.random() * Math.PI * 2;
+
+      // Color variations: Emerald, Mint, Cyan
+      const colors = [
+        { r: 16, g: 185, b: 129 },   // Emerald
+        { r: 0, g: 245, b: 160 },    // Mint Ultra
+        { r: 6, g: 182, b: 212 },    // Cyan Accent
+        { r: 52, g: 211, b: 153 }    // Emerald Light
+      ];
+      this.color = colors[Math.floor(Math.random() * colors.length)];
     }
 
     update() {
@@ -75,15 +118,15 @@ function initBackgroundCanvas() {
       if (this.x < 0 || this.x > width) this.vx *= -1;
       if (this.y < 0 || this.y > height) this.vy *= -1;
 
-      // Mouse collision repulsion
+      // Smooth mouse interaction (soft vortex gravitation)
       if (mouse.x !== null && mouse.y !== null) {
         const dx = this.x - mouse.x;
         const dy = this.y - mouse.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < mouse.radius) {
           const force = (mouse.radius - dist) / mouse.radius;
-          const dirX = (dx / dist) * force * 2;
-          const dirY = (dy / dist) * force * 2;
+          const dirX = (dx / dist) * force * 1.8;
+          const dirY = (dy / dist) * force * 1.8;
           this.x += dirX;
           this.y += dirY;
         }
@@ -91,42 +134,135 @@ function initBackgroundCanvas() {
     }
 
     draw() {
+      this.pulsePhase += 0.03;
+      const dynamicSize = this.size + Math.sin(this.pulsePhase) * 0.4;
+
+      // Soft radiant aura
+      const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, dynamicSize * 2.8);
+      grad.addColorStop(0, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, 0.9)`);
+      grad.addColorStop(0.5, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, 0.35)`);
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
       ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-      ctx.fillStyle = this.baseColor + '0.6)';
+      ctx.arc(this.x, this.y, dynamicSize * 2.8, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Sharp core
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, dynamicSize, 0, Math.PI * 2);
+      ctx.fillStyle = `rgb(${this.color.r}, ${this.color.g}, ${this.color.b})`;
       ctx.fill();
     }
   }
 
-  function initParticles() {
-    particles = [];
-    for (let i = 0; i < particleCount; i++) {
-      particles.push(new Particle());
+  // Layer 3: Traveling Fiber Light Packets
+  class DataPacket {
+    constructor(fromNode, toNode) {
+      this.from = fromNode;
+      this.to = toNode;
+      this.progress = 0;
+      this.speed = Math.random() * 0.015 + 0.012;
+      this.size = Math.random() * 1.8 + 1.2;
+    }
+
+    update() {
+      this.progress += this.speed;
+      return this.progress < 1;
+    }
+
+    draw() {
+      const px = this.from.x + (this.to.x - this.from.x) * this.progress;
+      const py = this.from.y + (this.to.y - this.from.y) * this.progress;
+
+      ctx.beginPath();
+      ctx.arc(px, py, this.size * 2, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.shadowColor = '#00f5a0';
+      ctx.shadowBlur = 8;
+      ctx.fill();
+      ctx.shadowBlur = 0; // reset
+    }
+  }
+
+  function createStars() {
+    stars = [];
+    for (let i = 0; i < starCount; i++) {
+      stars.push(new Star());
+    }
+  }
+
+  function createNodes() {
+    nodes = [];
+    for (let i = 0; i < nodeCount; i++) {
+      nodes.push(new ConstellationNode());
     }
   }
 
   function animate() {
     ctx.clearRect(0, 0, width, height);
 
-    for (let i = 0; i < particles.length; i++) {
-      particles[i].update();
-      particles[i].draw();
+    // 1. Draw twinkling stars
+    for (let i = 0; i < stars.length; i++) {
+      stars[i].draw();
+    }
+
+    // 2. Update and draw nodes
+    for (let i = 0; i < nodes.length; i++) {
+      nodes[i].update();
+      nodes[i].draw();
 
       // Connect with lines
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist < maxDistance) {
-          const opacity = (1 - dist / maxDistance) * 0.22;
+          const alpha = (1 - dist / maxDistance) * 0.28;
           ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(52, 211, 153, ${opacity})`;
-          ctx.lineWidth = 0.8;
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+
+          // Subtle gradient laser line
+          const lineGrad = ctx.createLinearGradient(nodes[i].x, nodes[i].y, nodes[j].x, nodes[j].y);
+          lineGrad.addColorStop(0, `rgba(${nodes[i].color.r}, ${nodes[i].color.g}, ${nodes[i].color.b}, ${alpha})`);
+          lineGrad.addColorStop(1, `rgba(${nodes[j].color.r}, ${nodes[j].color.g}, ${nodes[j].color.b}, ${alpha})`);
+
+          ctx.strokeStyle = lineGrad;
+          ctx.lineWidth = 0.85;
+          ctx.stroke();
+
+          // Occasionally spawn a high-speed data pulse packet
+          if (dataPackets.length < 12 && Math.random() < 0.0035) {
+            dataPackets.push(new DataPacket(nodes[i], nodes[j]));
+          }
+        }
+      }
+
+      // Connect to mouse cursor
+      if (mouse.x !== null && mouse.y !== null) {
+        const mdx = nodes[i].x - mouse.x;
+        const mdy = nodes[i].y - mouse.y;
+        const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+        if (mdist < mouse.radius) {
+          const mAlpha = (1 - mdist / mouse.radius) * 0.45;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(mouse.x, mouse.y);
+          ctx.strokeStyle = `rgba(0, 245, 160, ${mAlpha})`;
+          ctx.lineWidth = 1;
           ctx.stroke();
         }
+      }
+    }
+
+    // 3. Update & render data light pulses
+    for (let k = dataPackets.length - 1; k >= 0; k--) {
+      if (!dataPackets[k].update()) {
+        dataPackets.splice(k, 1);
+      } else {
+        dataPackets[k].draw();
       }
     }
 
@@ -134,39 +270,124 @@ function initBackgroundCanvas() {
   }
 
   resize();
-  initParticles();
+  createStars();
+  createNodes();
   animate();
 }
 
 /* ==========================================================================
-   2. Cursor Glow Spotlight
+   2. Cyber Custom Cursor & Click Ripple Burst
    ========================================================================== */
-function initSpotlight() {
+function initCustomCursorAndRipples() {
+  const dot = document.getElementById('custom-cursor-dot');
+  const ring = document.getElementById('custom-cursor-ring');
   const spotlight = document.getElementById('cursor-spotlight');
-  if (!spotlight || window.innerWidth < 768) return;
 
-  let currentX = -1000;
-  let currentY = -1000;
-  let targetX = -1000;
-  let targetY = -1000;
+  if (!dot || !ring) return;
+
+  let mouseX = -100;
+  let mouseY = -100;
+  let ringX = -100;
+  let ringY = -100;
+  let spotlightX = -100;
+  let spotlightY = -100;
 
   window.addEventListener('mousemove', (e) => {
-    targetX = e.clientX;
-    targetY = e.clientY;
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    dot.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
   });
 
-  function update() {
-    currentX += (targetX - currentX) * 0.12;
-    currentY += (targetY - currentY) * 0.12;
-    spotlight.style.transform = `translate(${currentX}px, ${currentY}px)`;
-    requestAnimationFrame(update);
-  }
+  function renderCursor() {
+    ringX += (mouseX - ringX) * 0.18;
+    ringY += (mouseY - ringY) * 0.18;
+    ring.style.transform = `translate(${ringX}px, ${ringY}px)`;
 
-  update();
+    if (spotlight) {
+      spotlightX += (mouseX - spotlightX) * 0.1;
+      spotlightY += (mouseY - spotlightY) * 0.1;
+      spotlight.style.transform = `translate(${spotlightX}px, ${spotlightY}px)`;
+    }
+
+    requestAnimationFrame(renderCursor);
+  }
+  renderCursor();
+
+  // Hover detection over interactive elements
+  const hoverSelectors = 'a, button, input, textarea, .project-card, .skill-category-card, .timeline-card, .hobby-card, .photo-thumb-btn, .copy-mini-btn, .avatar-frame, .stat-item, .terminal-window';
+  
+  document.addEventListener('mouseover', (e) => {
+    if (e.target.closest(hoverSelectors)) {
+      document.body.classList.add('cursor-hover');
+    }
+  });
+
+  document.addEventListener('mouseout', (e) => {
+    if (e.target.closest(hoverSelectors)) {
+      document.body.classList.remove('cursor-hover');
+    }
+  });
+
+  // Click shockwave ripple & sparks
+  document.addEventListener('click', (e) => {
+    ring.classList.add('cursor-click');
+    setTimeout(() => ring.classList.remove('cursor-click'), 180);
+
+    // Ripple
+    const ripple = document.createElement('div');
+    ripple.className = 'click-ripple';
+    ripple.style.left = `${e.clientX}px`;
+    ripple.style.top = `${e.clientY}px`;
+    document.body.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 650);
+
+    // Micro sparks
+    const sparkCount = 8;
+    for (let i = 0; i < sparkCount; i++) {
+      const spark = document.createElement('div');
+      spark.className = 'click-spark';
+      spark.style.left = `${e.clientX}px`;
+      spark.style.top = `${e.clientY}px`;
+      document.body.appendChild(spark);
+
+      const angle = (Math.PI * 2 / sparkCount) * i + (Math.random() - 0.5) * 0.5;
+      const speed = Math.random() * 35 + 25;
+      const targetX = Math.cos(angle) * speed;
+      const targetY = Math.sin(angle) * speed;
+
+      spark.animate([
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+        { transform: `translate(calc(-50% + ${targetX}px), calc(-50% + ${targetY}px)) scale(0)`, opacity: 0 }
+      ], {
+        duration: 450 + Math.random() * 150,
+        easing: 'cubic-bezier(0, 0.8, 0.2, 1)',
+        fill: 'forwards'
+      }).onfinish = () => spark.remove();
+    }
+  });
 }
 
 /* ==========================================================================
-   3. Dynamic Typing Text Effect
+   3. Interactive Mouse Border Spotlight on Cards
+   ========================================================================== */
+function initCardSpotlight() {
+  const cards = document.querySelectorAll(
+    '.project-card, .skill-category-card, .timeline-card, .bio-card, .terminal-window, .hobby-card, .contact-info-card, .contact-form-card, .avatar-3d-card, .ai-spotlight-box'
+  );
+
+  cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+    });
+  });
+}
+
+/* ==========================================================================
+   4. Dynamic Typing Text Effect
    ========================================================================== */
 function initTypingEffect() {
   const textEl = document.getElementById('typing-text');
@@ -215,10 +436,11 @@ function initTypingEffect() {
 }
 
 /* ==========================================================================
-   4. 3D Tilt Effect on Avatar Card
+   5. Holographic 3D Tilt on Avatar Card
    ========================================================================== */
 function initAvatar3DTilt() {
   const card = document.getElementById('avatar-card');
+  const glare = document.getElementById('avatar-card-glare');
   if (!card || window.innerWidth < 992) return;
 
   card.addEventListener('mousemove', (e) => {
@@ -228,14 +450,48 @@ function initAvatar3DTilt() {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const rotateX = ((y - centerY) / centerY) * -10;
-    const rotateY = ((x - centerX) / centerX) * 10;
+    const rotateX = ((y - centerY) / centerY) * -12;
+    const rotateY = ((x - centerX) / centerX) * 12;
 
-    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+
+    if (glare) {
+      const glareX = (x / rect.width) * 100;
+      const glareY = (y / rect.height) * 100;
+      glare.style.setProperty('--glare-x', `${glareX}%`);
+      glare.style.setProperty('--glare-y', `${glareY}%`);
+    }
   });
 
   card.addEventListener('mouseleave', () => {
     card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+  });
+}
+
+/* ==========================================================================
+   6. 3D Perspective Tilt for Project Cards
+   ========================================================================== */
+function initProjectCards3DTilt() {
+  if (window.innerWidth < 992) return;
+  const projectCards = document.querySelectorAll('.project-card');
+
+  projectCards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const rotateX = ((y - centerY) / centerY) * -5;
+      const rotateY = ((x - centerX) / centerX) * 5;
+
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+    });
   });
 }
 
@@ -832,4 +1088,194 @@ function initMobileMenu() {
       navLinks.classList.remove('open');
     });
   });
+}
+
+/* ==========================================================================
+   15. Interactive Terminal: Copy JSON Profile
+   ========================================================================== */
+function initTerminalInteractive() {
+  const copyBtn = document.getElementById('terminal-copy-btn');
+  const codeEl = document.querySelector('#terminal-body code');
+
+  if (!copyBtn || !codeEl) return;
+
+  copyBtn.addEventListener('click', () => {
+    const rawText = codeEl.innerText;
+    navigator.clipboard.writeText(rawText).then(() => {
+      const originalHTML = copyBtn.innerHTML;
+      copyBtn.innerHTML = `
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span>Đã chép! ✓</span>
+      `;
+      copyBtn.style.background = 'var(--emerald-primary)';
+      copyBtn.style.color = '#ffffff';
+
+      showToast("Đã sao chép cấu hình Developer Profile của Phan Tấn Kiệt!");
+
+      setTimeout(() => {
+        copyBtn.innerHTML = originalHTML;
+        copyBtn.style.background = '';
+        copyBtn.style.color = '';
+      }, 2500);
+    }).catch(() => {
+      showToast("Không thể sao chép, vui lòng chọn thủ công.");
+    });
+  });
+}
+
+/* ==========================================================================
+   16. Reading Scroll Progress Bar & Circular Back to Top Button
+   ========================================================================== */
+function initScrollProgressBarAndBackToTop() {
+  const progressBar = document.getElementById('scroll-progress-bar');
+  const backToTopBtn = document.getElementById('back-to-top-btn');
+  const circle = document.getElementById('progress-circle');
+
+  const circumference = 2 * Math.PI * 19; // ~119.38
+  if (circle) {
+    circle.style.strokeDasharray = circumference;
+    circle.style.strokeDashoffset = circumference;
+  }
+
+  function updateScroll() {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+
+    if (progressBar) {
+      progressBar.style.width = `${progress}%`;
+    }
+
+    if (backToTopBtn && circle) {
+      if (scrollTop > 380) {
+        backToTopBtn.classList.add('visible');
+      } else {
+        backToTopBtn.classList.remove('visible');
+      }
+
+      const offset = circumference - (progress / 100) * circumference;
+      circle.style.strokeDashoffset = Math.max(0, offset);
+    }
+  }
+
+  window.addEventListener('scroll', updateScroll, { passive: true });
+  updateScroll();
+
+  if (backToTopBtn) {
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  }
+}
+
+/* ==========================================================================
+   17. Scroll Reveal & Number Counters & Skill Bars
+   ========================================================================== */
+function initScrollRevealAndCounters() {
+  // 1. Observe all reveal-on-scroll elements
+  const revealElements = document.querySelectorAll(
+    '.reveal-on-scroll, section:not(.hero-section), .project-card, .skill-category-card, .timeline-card, .hobby-card, .contact-info-card, .contact-form-card'
+  );
+
+  const observerOptions = {
+    threshold: 0.12,
+    rootMargin: '0px 0px -40px 0px'
+  };
+
+  const revealObserver = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-revealed');
+        obs.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  revealElements.forEach((el, index) => {
+    el.classList.add('reveal-on-scroll');
+    // Stagger delay for cards inside grids
+    if (el.classList.contains('project-card') || el.classList.contains('skill-category-card') || el.classList.contains('timeline-card') || el.classList.contains('hobby-card')) {
+      const delay = (index % 4) * 0.1;
+      el.style.transitionDelay = `${delay}s`;
+    }
+    revealObserver.observe(el);
+  });
+
+  // 2. Animate Hero Number Counters
+  const heroStats = document.querySelector('.hero-stats');
+  let countersAnimated = false;
+
+  function runCounters() {
+    if (countersAnimated) return;
+    countersAnimated = true;
+
+    const statNumbers = document.querySelectorAll('.stat-number[data-count]');
+    statNumbers.forEach(stat => {
+      const target = parseInt(stat.getAttribute('data-count'), 10);
+      const suffix = stat.getAttribute('data-suffix') || '';
+      const duration = 1800; // ms
+      const startTime = performance.now();
+
+      function step(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // Exponential ease out
+        const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+        const current = Math.floor(ease * target);
+        stat.textContent = current + suffix;
+
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          stat.textContent = target + suffix;
+        }
+      }
+
+      requestAnimationFrame(step);
+    });
+  }
+
+  if (heroStats) {
+    const statsObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        runCounters();
+        statsObserver.disconnect();
+      }
+    }, { threshold: 0.2 });
+
+    statsObserver.observe(heroStats);
+  }
+
+  // 3. Animate Skill Progress Bars
+  const skillsSection = document.getElementById('skills');
+  let skillsAnimated = false;
+
+  function runSkillsBars() {
+    if (skillsAnimated) return;
+    skillsAnimated = true;
+
+    const skillBars = document.querySelectorAll('.skill-progress-bar[data-progress]');
+    skillBars.forEach((bar, idx) => {
+      const targetPercent = bar.getAttribute('data-progress');
+      setTimeout(() => {
+        bar.style.width = `${targetPercent}%`;
+      }, idx * 60);
+    });
+  }
+
+  if (skillsSection) {
+    const skillsObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        runSkillsBars();
+        skillsObserver.disconnect();
+      }
+    }, { threshold: 0.15 });
+
+    skillsObserver.observe(skillsSection);
+  }
 }

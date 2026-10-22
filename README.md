@@ -48,7 +48,7 @@ Website được xây dựng theo phong cách hiện đại **Cyber Emerald & Ob
 1. **Particle Constellation Canvas**: Mạng lưới hạt chòm sao chuyển động và liên kết tương tác theo chuột.
 2. **Interactive Cursor Spotlight Glow**: Vệt sáng dạ quang xanh Emerald di chuyển theo con trỏ chuột.
 3. **Dynamic Typing Animation**: Tự động gõ và chuyển đổi các chức danh năng lực.
-4. **3D Tilt Avatar Card & Photo Switcher**: Thẻ hồ sơ phản hồi góc nhìn 3D kèm bộ nút chuyển đổi linh hoạt các ảnh chân dung thật (`photo1`, `photo2`, `photo3`).
+4. **3D Tilt Avatar Card & Photo Switcher**: Thẻ hồ sơ phản hồi góc nhìn 3D kèm bộ nút chuyển đổi linh hoạt các ảnh chân dung thật (`photo1`, `photo2`).
 5. **Original PDF Export & High-Res Viewer**:
    - Tự động xuất và tải ngay file PDF gốc chuẩn TopCV (`CV THUC TAP PHAN TAN KIET.pdf`).
    - Khung xem trước hình ảnh CV gốc siêu sắc nét (200 DPI) với tùy chọn tải ảnh PNG hoặc in ấn (Print) chuẩn khổ giấy A4.

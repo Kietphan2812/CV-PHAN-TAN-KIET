@@ -43,8 +43,10 @@
   <div class="ambient-orb ambient-orb-2" aria-hidden="true"></div>
   <div class="ambient-orb ambient-orb-3" aria-hidden="true"></div>
 
-  <!-- Interactive Spotlight Follower -->
+  <!-- Interactive Spotlight Follower & Cyber Cursor -->
   <div class="cursor-spotlight" id="cursor-spotlight" aria-hidden="true"></div>
+  <div class="custom-cursor-dot" id="custom-cursor-dot" aria-hidden="true"></div>
+  <div class="custom-cursor-ring" id="custom-cursor-ring" aria-hidden="true"></div>
 
   <!-- Audio Player (Background chill soundtrack) -->
   <audio id="bg-music" src="assets/audio/bg-music.mp3" loop preload="metadata"></audio>
@@ -120,6 +122,8 @@
         </button>
       </div>
     </div>
+    <!-- Reading Scroll Progress Bar -->
+    <div class="scroll-progress-bar" id="scroll-progress-bar" aria-hidden="true"></div>
   </header>
 
   <!-- ==========================================================================
@@ -210,21 +214,21 @@
           </div>
 
           <!-- Hero Metrics Stats -->
-          <div class="hero-stats">
+          <div class="hero-stats reveal-on-scroll">
             <div class="stat-item">
-              <span class="stat-number" data-count="4">4+</span>
+              <span class="stat-number" data-count="4" data-suffix="+">4+</span>
               <span class="stat-label">Dự án Web Live trên Cloud</span>
             </div>
             <div class="stat-item">
-              <span class="stat-number" data-count="1">1</span>
+              <span class="stat-number" data-count="1" data-suffix="">1</span>
               <span class="stat-label">Hệ thống GPS trường sử dụng</span>
             </div>
             <div class="stat-item">
-              <span class="stat-number" data-count="4">4 Năm</span>
+              <span class="stat-number" data-count="4" data-suffix=" Năm">4 Năm</span>
               <span class="stat-label">Lớp trưởng & Trưởng nhóm</span>
             </div>
             <div class="stat-item">
-              <span class="stat-number">100%</span>
+              <span class="stat-number" data-count="100" data-suffix="%">100%</span>
               <span class="stat-label">Chủ động tự học & Thực chiến</span>
             </div>
           </div>
@@ -252,10 +256,13 @@
 
           <!-- 3D Card -->
           <div class="avatar-3d-card" id="avatar-card">
+            <!-- Holographic Card Glare Overlay -->
+            <div class="card-glare" id="avatar-card-glare" aria-hidden="true"></div>
+
             <!-- Avatar Frame -->
             <div class="avatar-frame" id="avatar-frame-trigger" title="Nhấn để phóng to ảnh cá nhân">
               <div class="avatar-inner">
-                <img id="main-avatar-img" src="assets/images/photo2.jpg" alt="Phan Tấn Kiệt - Chân dung đại diện">
+                <img id="main-avatar-img" src="assets/images/photo1.jpg" alt="Phan Tấn Kiệt - Chân dung đại diện">
               </div>
               <div class="avatar-tag">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
@@ -272,12 +279,12 @@
 
               <!-- Photo Switcher Controls (Tự động luân chuyển 2 ảnh) -->
               <div class="avatar-photo-controls">
-                <button class="photo-thumb-btn active" data-img="assets/images/photo2.jpg"
+                <button class="photo-thumb-btn active" data-img="assets/images/photo1.jpg"
                   title="Ảnh chân dung đại diện 1">
-                  <img src="assets/images/photo2.jpg" alt="Ảnh 1">
+                  <img src="assets/images/photo1.jpg" alt="Ảnh 1">
                 </button>
-                <button class="photo-thumb-btn" data-img="assets/images/photo3.jpg" title="Ảnh chân dung đại diện 2">
-                  <img src="assets/images/photo3.jpg" alt="Ảnh 2">
+                <button class="photo-thumb-btn" data-img="assets/images/photo2.jpg" title="Ảnh chân dung đại diện 2">
+                  <img src="assets/images/photo2.jpg" alt="Ảnh 2">
                 </button>
               </div>
             </div>
@@ -400,7 +407,7 @@
         </div>
 
         <!-- Right: Interactive Code Profile Terminal -->
-        <div class="terminal-window">
+        <div class="terminal-window reveal-on-scroll">
           <div class="terminal-header">
             <div class="terminal-dots">
               <span class="terminal-dot dot-red"></span>
@@ -408,9 +415,19 @@
               <span class="terminal-dot dot-green"></span>
             </div>
             <span class="terminal-title">kiet_phan_developer_profile.json</span>
-            <span style="font-size: 0.75rem; color: var(--emerald-light);">node v20.x</span>
+            <div class="terminal-header-right">
+              <span class="terminal-status"><span class="status-pulse-dot"></span> LIVE JSON</span>
+              <button class="terminal-copy-btn" id="terminal-copy-btn" type="button" title="Sao chép JSON Profile">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span>Sao chép</span>
+              </button>
+            </div>
           </div>
-          <div class="terminal-body">
+          <div class="terminal-body" id="terminal-body">
+            <div class="terminal-scanline" aria-hidden="true"></div>
             <pre><code><span class="code-comment">// Hồ sơ năng lực thực tập sinh Phan Tấn Kiệt</span>
 {
   <span class="code-var">"name"</span>: <span class="code-str">"Phan Tấn Kiệt"</span>,
@@ -950,7 +967,7 @@
                 <span class="skill-percent">88%</span>
               </div>
               <div class="skill-progress-track">
-                <div class="skill-progress-bar" style="width: 88%"></div>
+                <div class="skill-progress-bar" data-progress="88" style="width: 0%"></div>
               </div>
             </div>
 
@@ -960,7 +977,7 @@
                 <span class="skill-percent">85%</span>
               </div>
               <div class="skill-progress-track">
-                <div class="skill-progress-bar" style="width: 85%"></div>
+                <div class="skill-progress-bar" data-progress="85" style="width: 0%"></div>
               </div>
             </div>
 
@@ -970,7 +987,7 @@
                 <span class="skill-percent">82%</span>
               </div>
               <div class="skill-progress-track">
-                <div class="skill-progress-bar" style="width: 82%"></div>
+                <div class="skill-progress-bar" data-progress="82" style="width: 0%"></div>
               </div>
             </div>
 
@@ -980,7 +997,7 @@
                 <span class="skill-percent">78%</span>
               </div>
               <div class="skill-progress-track">
-                <div class="skill-progress-bar" style="width: 78%"></div>
+                <div class="skill-progress-bar" data-progress="78" style="width: 0%"></div>
               </div>
             </div>
           </div>
@@ -1009,7 +1026,7 @@
                 <span class="skill-percent">80%</span>
               </div>
               <div class="skill-progress-track">
-                <div class="skill-progress-bar" style="width: 80%"></div>
+                <div class="skill-progress-bar" data-progress="80" style="width: 0%"></div>
               </div>
             </div>
 
@@ -1019,7 +1036,7 @@
                 <span class="skill-percent">86%</span>
               </div>
               <div class="skill-progress-track">
-                <div class="skill-progress-bar" style="width: 86%"></div>
+                <div class="skill-progress-bar" data-progress="86" style="width: 0%"></div>
               </div>
             </div>
 
@@ -1029,7 +1046,7 @@
                 <span class="skill-percent">84%</span>
               </div>
               <div class="skill-progress-track">
-                <div class="skill-progress-bar" style="width: 84%"></div>
+                <div class="skill-progress-bar" data-progress="84" style="width: 0%"></div>
               </div>
             </div>
 
@@ -1039,7 +1056,7 @@
                 <span class="skill-percent">82%</span>
               </div>
               <div class="skill-progress-track">
-                <div class="skill-progress-bar" style="width: 82%"></div>
+                <div class="skill-progress-bar" data-progress="82" style="width: 0%"></div>
               </div>
             </div>
           </div>
@@ -1070,7 +1087,7 @@
                 <span class="skill-percent">85%</span>
               </div>
               <div class="skill-progress-track">
-                <div class="skill-progress-bar" style="width: 85%"></div>
+                <div class="skill-progress-bar" data-progress="85" style="width: 0%"></div>
               </div>
             </div>
 
@@ -1080,7 +1097,7 @@
                 <span class="skill-percent">76%</span>
               </div>
               <div class="skill-progress-track">
-                <div class="skill-progress-bar" style="width: 76%"></div>
+                <div class="skill-progress-bar" data-progress="76" style="width: 0%"></div>
               </div>
             </div>
 
@@ -1090,7 +1107,7 @@
                 <span class="skill-percent">80%</span>
               </div>
               <div class="skill-progress-track">
-                <div class="skill-progress-bar" style="width: 80%"></div>
+                <div class="skill-progress-bar" data-progress="80" style="width: 0%"></div>
               </div>
             </div>
 
@@ -1100,7 +1117,7 @@
                 <span class="skill-percent">90%</span>
               </div>
               <div class="skill-progress-track">
-                <div class="skill-progress-bar" style="width: 90%"></div>
+                <div class="skill-progress-bar" data-progress="90" style="width: 0%"></div>
               </div>
             </div>
           </div>
@@ -1555,6 +1572,17 @@
 
   <!-- Toast Container -->
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- Floating Back to Top Button with SVG Circular Progress -->
+  <button class="back-to-top-btn" id="back-to-top-btn" type="button" aria-label="Lên đầu trang" title="Về đầu trang">
+    <svg class="progress-ring" width="46" height="46" viewBox="0 0 46 46">
+      <circle class="progress-ring-bg" cx="23" cy="23" r="19" fill="none" stroke-width="3"></circle>
+      <circle class="progress-ring-circle" id="progress-circle" cx="23" cy="23" r="19" fill="none" stroke-width="3"></circle>
+    </svg>
+    <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
 
   <!-- JavaScript -->
   <script src="script.js"></script>
