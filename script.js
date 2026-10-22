@@ -8,6 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initBackgroundCanvas();
   initCustomCursorAndRipples();
   initCardSpotlight();
+  initCardSpecularGlare();
+  initCyberTextScramble();
+  initSmoothInertiaScroll();
+  initSfxToggle();
   initMagneticButtons();
   initParallaxDepth();
   initTypingEffect();
@@ -187,6 +191,60 @@ function initBackgroundCanvas() {
     }
   }
 
+  // Layer 4: Occasional High-Speed Shooting Stars / Meteors
+  let meteors = [];
+  class Meteor {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.x = Math.random() * (width + 200);
+      this.y = Math.random() * (height * 0.45);
+      this.length = Math.random() * 85 + 65;
+      this.speed = Math.random() * 14 + 11;
+      this.angle = Math.PI / 4 + (Math.random() - 0.5) * 0.15;
+      this.alpha = 1;
+      this.active = true;
+    }
+    update() {
+      if (!this.active) return false;
+      this.x -= Math.cos(this.angle) * this.speed;
+      this.y += Math.sin(this.angle) * this.speed;
+      this.alpha -= 0.018;
+      if (this.alpha <= 0 || this.x < -100 || this.y > height + 100) {
+        this.active = false;
+        return false;
+      }
+      return true;
+    }
+    draw() {
+      if (!this.active) return;
+      const tailX = this.x + Math.cos(this.angle) * this.length;
+      const tailY = this.y - Math.sin(this.angle) * this.length;
+
+      const grad = ctx.createLinearGradient(this.x, this.y, tailX, tailY);
+      grad.addColorStop(0, `rgba(255, 255, 255, ${this.alpha})`);
+      grad.addColorStop(0.35, `rgba(0, 245, 160, ${this.alpha * 0.85})`);
+      grad.addColorStop(1, 'rgba(0, 245, 160, 0)');
+
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(tailX, tailY);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1.9;
+      ctx.stroke();
+
+      // Glowing core head
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, 2.2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+      ctx.shadowColor = '#00f5a0';
+      ctx.shadowBlur = 12;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  }
+
   function createStars() {
     stars = [];
     for (let i = 0; i < starCount; i++) {
@@ -268,6 +326,18 @@ function initBackgroundCanvas() {
       }
     }
 
+    // 4. Update & render shooting stars / meteors
+    if (Math.random() < 0.007 && meteors.length < 3) {
+      meteors.push(new Meteor());
+    }
+    for (let m = meteors.length - 1; m >= 0; m--) {
+      if (!meteors[m].update()) {
+        meteors.splice(m, 1);
+      } else {
+        meteors[m].draw();
+      }
+    }
+
     requestAnimationFrame(animate);
   }
 
@@ -283,6 +353,7 @@ function initBackgroundCanvas() {
 function initCustomCursorAndRipples() {
   const dot = document.getElementById('custom-cursor-dot');
   const ring = document.getElementById('custom-cursor-ring');
+  const cursorLabel = document.getElementById('cursor-label');
   const spotlight = document.getElementById('cursor-spotlight');
 
   if (!dot || !ring) return;
@@ -344,18 +415,46 @@ function initCustomCursorAndRipples() {
   }
   renderCursor();
 
-  // Hover detection over interactive elements
+  // Smart Contextual Morphing Detection (Awwwards Signature)
   const hoverSelectors = 'a, button, input, textarea, .project-card, .skill-category-card, .timeline-card, .hobby-card, .photo-thumb-btn, .copy-mini-btn, .avatar-frame, .stat-item, .terminal-window';
-  
+
+  function getContextualLabel(target) {
+    if (!target) return null;
+    const explicit = target.getAttribute('data-cursor-text');
+    if (explicit) return explicit;
+
+    if (target.closest('.project-card')) return 'XEM DỰ ÁN ↗';
+    if (target.closest('.photo-thumb-btn') || target.closest('#avatar-frame-trigger')) return 'ĐỔI ẢNH 🔄';
+    if (target.closest('.copy-mini-btn')) return 'COPY 📋';
+    if (target.closest('#audio-toggle-btn')) return 'NHẠC NỀN 🎵';
+    if (target.closest('#sfx-toggle-btn')) return 'HIỆU ỨNG 🔊';
+    if (target.closest('#theme-toggle-btn')) return 'GIAO DIỆN 🌓';
+    if (target.closest('#print-cv-btn') || target.closest('#btn-print-cv-header')) return 'IN CV 📄';
+    if (target.closest('.terminal-window')) return 'TERMINAL ⚡';
+    if (target.closest('.filter-btn')) return 'BỘ LỌC 📂';
+    if (target.closest('a[target="_blank"]')) return 'MỞ LINK ↗';
+    return null;
+  }
+
   document.addEventListener('mouseover', (e) => {
-    if (e.target.closest(hoverSelectors)) {
+    const labelText = getContextualLabel(e.target);
+    if (labelText && cursorLabel) {
+      cursorLabel.textContent = labelText;
+      ring.classList.add('cursor-has-label');
+      document.body.classList.add('cursor-hover');
+    } else if (e.target.closest(hoverSelectors)) {
+      ring.classList.remove('cursor-has-label');
+      if (cursorLabel) cursorLabel.textContent = '';
       document.body.classList.add('cursor-hover');
     }
   });
 
   document.addEventListener('mouseout', (e) => {
-    if (e.target.closest(hoverSelectors)) {
+    const toEl = e.relatedTarget ? e.relatedTarget.closest(hoverSelectors) : null;
+    if (!toEl) {
       document.body.classList.remove('cursor-hover');
+      ring.classList.remove('cursor-has-label');
+      if (cursorLabel) cursorLabel.textContent = '';
     }
   });
 
@@ -1468,7 +1567,10 @@ function getAudioContext() {
   return audioCtx;
 }
 
+let sfxEnabled = true;
+
 function playCyberTone(type = 'tick') {
+  if (!sfxEnabled) return;
   try {
     const ctx = getAudioContext();
     if (!ctx) return;
@@ -1508,5 +1610,175 @@ function playCyberTone(type = 'tick') {
   } catch (err) {
     // Silently continue if autoplay policies apply
   }
+}
+
+/* ==========================================================================
+   21. SFX Synthesizer Toggle & Controller
+   ========================================================================== */
+function initSfxToggle() {
+  const sfxBtn = document.getElementById('sfx-toggle-btn');
+  if (!sfxBtn) return;
+
+  const saved = localStorage.getItem('sfx_enabled');
+  if (saved !== null) {
+    sfxEnabled = saved === 'true';
+  }
+
+  function updateBtnUI() {
+    if (sfxEnabled) {
+      sfxBtn.classList.add('active');
+      sfxBtn.classList.remove('muted');
+      sfxBtn.title = 'Bật/Tắt âm thanh tương tác vi điện tử (Đang Bật)';
+    } else {
+      sfxBtn.classList.remove('active');
+      sfxBtn.classList.add('muted');
+      sfxBtn.title = 'Bật/Tắt âm thanh tương tác vi điện tử (Đang Tắt)';
+    }
+  }
+  updateBtnUI();
+
+  sfxBtn.addEventListener('click', () => {
+    sfxEnabled = !sfxEnabled;
+    localStorage.setItem('sfx_enabled', sfxEnabled);
+    updateBtnUI();
+    if (sfxEnabled) {
+      playCyberTone('blip');
+    }
+  });
+}
+
+/* ==========================================================================
+   22. Dynamic Specular Glare (Apple & Stripe Specular Reflection on Cards)
+   ========================================================================== */
+function initCardSpecularGlare() {
+  const cards = document.querySelectorAll(
+    '.project-card, .skill-category-card, .timeline-card, .hobby-card, .bio-card, .terminal-window'
+  );
+
+  cards.forEach(card => {
+    if (!card.querySelector('.card-glare')) {
+      const glare = document.createElement('div');
+      glare.className = 'card-glare';
+      glare.setAttribute('aria-hidden', 'true');
+      card.appendChild(glare);
+    }
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
+      const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
+      card.style.setProperty('--glare-x', `${xPercent.toFixed(1)}%`);
+      card.style.setProperty('--glare-y', `${yPercent.toFixed(1)}%`);
+    });
+  });
+}
+
+/* ==========================================================================
+   23. Cyber Matrix Text Decryption Scramble (Awwwards Typography)
+   ========================================================================== */
+function initCyberTextScramble() {
+  const scrambleElements = document.querySelectorAll('.cyber-scramble');
+  const glyphs = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789_#@$%&*+=~^';
+
+  function scramble(el) {
+    if (el.dataset.scrambling === 'true') return;
+    el.dataset.scrambling = 'true';
+    el.classList.add('scrambling');
+
+    const original = el.getAttribute('data-original') || el.textContent;
+    let iteration = 0;
+    const maxIterations = original.length;
+
+    const interval = setInterval(() => {
+      el.textContent = original
+        .split('')
+        .map((char, index) => {
+          if (char === ' ') return ' ';
+          if (index < iteration) {
+            return original[index];
+          }
+          return glyphs[Math.floor(Math.random() * glyphs.length)];
+        })
+        .join('');
+
+      if (iteration >= maxIterations) {
+        clearInterval(interval);
+        el.textContent = original;
+        el.dataset.scrambling = 'false';
+        el.classList.remove('scrambling');
+      }
+
+      iteration += 1 / 2.5; // Decryption cadence
+    }, 28);
+  }
+
+  // Trigger once on page load
+  setTimeout(() => {
+    scrambleElements.forEach(el => scramble(el));
+  }, 450);
+
+  // Trigger on hover
+  scrambleElements.forEach(el => {
+    el.addEventListener('mouseenter', () => scramble(el));
+  });
+}
+
+/* ==========================================================================
+   24. Lenis-Style Inertial Momentum Smooth Scrolling (Velvety Smooth 60fps+ LERP)
+   ========================================================================== */
+function initSmoothInertiaScroll() {
+  // Only apply on desktop non-touch screens with fine pointer
+  if (window.innerWidth < 992 || window.matchMedia('(pointer: coarse)').matches) return;
+
+  let currentY = window.scrollY;
+  let targetY = window.scrollY;
+  let isMoving = false;
+  let rafId = null;
+
+  function clamp(val, min, max) {
+    return Math.max(min, Math.min(val, max));
+  }
+
+  function maxScroll() {
+    return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  }
+
+  function updateScroll() {
+    const diff = targetY - currentY;
+    // Exponential deceleration curve
+    currentY += diff * 0.092;
+
+    window.scrollTo(0, currentY);
+
+    if (Math.abs(diff) > 0.6) {
+      rafId = requestAnimationFrame(updateScroll);
+    } else {
+      currentY = targetY;
+      window.scrollTo(0, currentY);
+      isMoving = false;
+    }
+  }
+
+  window.addEventListener('wheel', (e) => {
+    // If inside a scrollable modal dialog or terminal, preserve native local scrolling
+    if (e.target.closest('.modal-dialog, .terminal-body')) return;
+
+    e.preventDefault();
+    targetY = clamp(targetY + e.deltaY * 0.95, 0, maxScroll());
+
+    if (!isMoving) {
+      isMoving = true;
+      currentY = window.scrollY;
+      rafId = requestAnimationFrame(updateScroll);
+    }
+  }, { passive: false });
+
+  // Sync target when user navigates via anchor links or back-to-top button
+  window.addEventListener('scroll', () => {
+    if (!isMoving) {
+      targetY = window.scrollY;
+      currentY = window.scrollY;
+    }
+  }, { passive: true });
 }
 
