@@ -1112,33 +1112,159 @@ function initThemeToggle() {
 }
 
 /* ==========================================================================
-   11. Background Ambient Audio Controller
+   11. Background Ambient Audio Controller (Auto-play on Screen Touch)
    ========================================================================== */
 function initAudioPlayer() {
   const audio = document.getElementById('bg-music');
-  const btn = document.getElementById('audio-toggle-btn');
+  const playerGroup = document.getElementById('audio-player-group');
+  const toggleBtn = document.getElementById('audio-toggle-btn');
+  const nextBtn = document.getElementById('audio-next-btn');
+  const audioText = document.getElementById('audio-text');
 
-  if (!audio || !btn) return;
+  if (!audio) return;
 
-  audio.volume = 0.4;
+  const TARGET_VOLUME = 0.35;
+  const playlist = [
+    { title: 'Giai điệu thư giãn 🌿', src: 'assets/audio/ambient-relax.mp3' },
+    { title: 'Lo-Fi Chill tập trung ☕', src: 'assets/audio/chill-study.mp3' }
+  ];
+  let currentTrackIdx = 0;
   let isPlaying = false;
+  let userMuted = sessionStorage.getItem('cv_audio_user_muted') === '1';
+  let fadeTimer = null;
 
-  btn.addEventListener('click', () => {
-    if (audio.paused) {
-      audio.play().then(() => {
-        isPlaying = true;
-        btn.classList.add('playing');
-        showToast("Đang phát nhạc nền thư giãn 🎵");
-      }).catch(() => {
-        showToast("Trình duyệt chặn phát âm thanh tự động, vui lòng thử lại.");
-      });
+  function setPlayingUI(playing) {
+    isPlaying = playing;
+    if (playing) {
+      if (playerGroup) playerGroup.classList.add('playing');
+      if (toggleBtn) toggleBtn.classList.add('playing');
+      if (audioText) audioText.textContent = 'Đang phát 🎵';
     } else {
-      audio.pause();
-      isPlaying = false;
-      btn.classList.remove('playing');
-      showToast("Đã tạm dừng nhạc nền.");
+      if (playerGroup) playerGroup.classList.remove('playing');
+      if (toggleBtn) toggleBtn.classList.remove('playing');
+      if (audioText) audioText.textContent = 'Nhạc nền';
     }
-  });
+  }
+
+  function smoothFadeIn(durationMs = 1500) {
+    if (fadeTimer) clearInterval(fadeTimer);
+    audio.volume = 0.02;
+    const steps = 25;
+    const stepTime = durationMs / steps;
+    const volStep = (TARGET_VOLUME - 0.02) / steps;
+
+    fadeTimer = setInterval(() => {
+      if (audio.volume + volStep >= TARGET_VOLUME) {
+        audio.volume = TARGET_VOLUME;
+        clearInterval(fadeTimer);
+        fadeTimer = null;
+      } else {
+        audio.volume = Math.min(TARGET_VOLUME, audio.volume + volStep);
+      }
+    }, stepTime);
+  }
+
+  function playCurrentTrack(isAutoFromTouch = false) {
+    if (userMuted && isAutoFromTouch) return;
+
+    audio.play().then(() => {
+      setPlayingUI(true);
+      smoothFadeIn(1400);
+      if (isAutoFromTouch) {
+        showToast('🎵 Đang phát nhạc nền nhẹ nhàng (Chạm nút góc trên để bật/tắt)');
+      }
+    }).catch((err) => {
+      // Browser autoplay restriction waiting for gesture
+      console.log('Chờ tương tác để phát nhạc:', err);
+    });
+  }
+
+  function pauseTrack() {
+    if (fadeTimer) clearInterval(fadeTimer);
+    audio.pause();
+    setPlayingUI(false);
+  }
+
+  // --- Auto-play on first screen touch / click anywhere ---
+  function onFirstScreenTouch(e) {
+    // If user clicked directly on audio controls, let button handler manage it
+    if (e.target && (e.target.closest('#audio-player-group') || e.target.closest('#audio-toggle-btn') || e.target.closest('#audio-next-btn'))) {
+      cleanupTouchListeners();
+      return;
+    }
+
+    cleanupTouchListeners();
+
+    if (audio.paused && !userMuted) {
+      playCurrentTrack(true);
+    }
+  }
+
+  const touchEvents = ['touchstart', 'touchend', 'pointerdown', 'click', 'keydown'];
+  function setupTouchListeners() {
+    touchEvents.forEach(evt => {
+      window.addEventListener(evt, onFirstScreenTouch, { passive: true, once: true });
+    });
+  }
+
+  function cleanupTouchListeners() {
+    touchEvents.forEach(evt => {
+      window.removeEventListener(evt, onFirstScreenTouch);
+    });
+  }
+
+  // Initial attempt (or listen on screen touch)
+  if (!userMuted) {
+    audio.play().then(() => {
+      setPlayingUI(true);
+      smoothFadeIn(1400);
+    }).catch(() => {
+      // Browser policy: register touch listeners to play as soon as screen is touched
+      setupTouchListeners();
+    });
+  }
+
+  // --- Toggle Play / Pause Button ---
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      cleanupTouchListeners();
+
+      if (audio.paused) {
+        userMuted = false;
+        sessionStorage.removeItem('cv_audio_user_muted');
+        playCurrentTrack(false);
+        showToast('🎵 Tiếp tục phát nhạc nền');
+      } else {
+        userMuted = true;
+        sessionStorage.setItem('cv_audio_user_muted', '1');
+        pauseTrack();
+        showToast('Đã tạm dừng nhạc nền 🔇');
+      }
+    });
+  }
+
+  // --- Next Track Button ---
+  if (nextBtn) {
+    nextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      cleanupTouchListeners();
+
+      currentTrackIdx = (currentTrackIdx + 1) % playlist.length;
+      const nextTrack = playlist[currentTrackIdx];
+      audio.src = nextTrack.src;
+      userMuted = false;
+      sessionStorage.removeItem('cv_audio_user_muted');
+
+      audio.play().then(() => {
+        setPlayingUI(true);
+        smoothFadeIn(1000);
+        showToast(`🎵 Đang phát: ${nextTrack.title}`);
+      }).catch((err) => {
+        console.warn('Next track error:', err);
+      });
+    });
+  }
 }
 
 /* ==========================================================================

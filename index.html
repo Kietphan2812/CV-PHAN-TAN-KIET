@@ -54,7 +54,7 @@
   </div>
 
   <!-- Audio Player (Background chill soundtrack) -->
-  <audio id="bg-music" src="assets/audio/bg-music.mp3" loop preload="metadata"></audio>
+  <audio id="bg-music" src="assets/audio/ambient-relax.mp3" loop preload="auto"></audio>
 
   <!-- ==========================================================================
        HEADER & NAVIGATION
@@ -84,13 +84,18 @@
       <!-- Action Buttons -->
       <div class="nav-actions">
         <!-- Audio Ambient Widget -->
-        <button class="audio-toggle-btn" id="audio-toggle-btn" type="button" title="Bật/Tắt nhạc nền thư giãn"
-          aria-label="Bật/Tắt nhạc nền">
-          <span class="audio-wave">
-            <span></span><span></span><span></span>
-          </span>
-          <span class="audio-text">Nhạc nền</span>
-        </button>
+        <div class="audio-player-group" id="audio-player-group">
+          <button class="audio-toggle-btn" id="audio-toggle-btn" type="button" title="Bật/Tắt nhạc nền thư giãn"
+            aria-label="Bật/Tắt nhạc nền">
+            <span class="audio-wave">
+              <span></span><span></span><span></span>
+            </span>
+            <span class="audio-text" id="audio-text">Nhạc nền</span>
+          </button>
+          <button class="audio-next-btn" id="audio-next-btn" type="button" title="Đổi bài nhạc nhẹ nhàng tiếp theo" aria-label="Đổi bài hát">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
+          </button>
+        </div>
 
         <!-- Cyber Sound FX Synthesizer Toggle -->
         <button class="btn-icon sfx-toggle-btn active" id="sfx-toggle-btn" type="button" title="Bật/Tắt âm thanh tương tác vi điện tử"
