@@ -1979,9 +1979,9 @@ textarea.form-control {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(4, 8, 14, 0.82);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(4, 8, 14, 0.85);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
   z-index: 2000;
   display: flex;
   align-items: center;
@@ -1989,12 +1989,14 @@ textarea.form-control {
   padding: 20px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--transition-normal);
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.35s ease;
 }
 
 .modal-overlay.active {
   opacity: 1;
   pointer-events: auto;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .modal-dialog {
@@ -2005,14 +2007,16 @@ textarea.form-control {
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), var(--glow-shadow);
-  transform: translateY(20px) scale(0.97);
-  transition: transform var(--transition-normal);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), var(--glow-shadow-lg);
+  transform: perspective(1000px) scale(0.88) translateY(35px) rotateX(8deg);
+  opacity: 0;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
   position: relative;
 }
 
 .modal-overlay.active .modal-dialog {
-  transform: translateY(0) scale(1);
+  transform: perspective(1000px) scale(1) translateY(0) rotateX(0deg);
+  opacity: 1;
 }
 
 .modal-close-btn {
@@ -2786,6 +2790,164 @@ body.cursor-hover .custom-cursor-ring {
 .audio-toggle-btn.playing {
   box-shadow: 0 0 22px rgba(0, 245, 160, 0.45);
   border-color: var(--emerald-ultra);
+}
+
+/* ==========================================================================
+   VIP ELITE MOTION & PHYSICS SUITE
+   - Fluid Nav Active Sliding Pill
+   - Fluid Projects Filter Sliding Segmented Pill
+   - Comet Cursor Particle Trail
+   - Magnetic Button Elastic Pull Physics
+   - 3D Shutter Flip for Avatar Transition
+   ========================================================================== */
+
+/* 1. Fluid Nav Active Sliding Pill */
+.nav-links {
+  position: relative;
+}
+
+.nav-active-pill {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 36px;
+  margin-top: -18px;
+  border-radius: 10px;
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.28);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.25s ease;
+}
+
+.nav-item {
+  position: relative;
+  z-index: 1;
+}
+
+.nav-item a {
+  position: relative;
+  z-index: 2;
+  transition: color 0.25s ease;
+}
+
+.nav-item a.active {
+  background: transparent !important;
+}
+
+.nav-item a.active::after {
+  display: none !important;
+}
+
+/* 2. Fluid Projects Filter Sliding Segmented Pill */
+.projects-filter-bar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 44px;
+  padding: 5px;
+  background: rgba(13, 22, 34, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 40px;
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+  width: auto;
+  max-width: 100%;
+}
+
+.filter-active-pill {
+  position: absolute;
+  top: 5px;
+  left: 0;
+  height: calc(100% - 10px);
+  border-radius: 30px;
+  background: var(--grad-emerald);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              width 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.25s ease;
+}
+
+.filter-btn {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  transition: color 0.25s ease, transform 0.2s ease;
+}
+
+.filter-btn:hover {
+  transform: translateY(-1px);
+}
+
+.filter-btn.active {
+  color: #ffffff !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* 3. Comet Cursor Particle Trail */
+.cursor-trail-particle {
+  position: fixed;
+  pointer-events: none;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 99995;
+  animation: cometTrailFade 0.7s cubic-bezier(0, 0.7, 0.2, 1) forwards;
+}
+
+@keyframes cometTrailFade {
+  0% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.15) translateY(-8px);
+  }
+}
+
+/* 4. Magnetic Button Elastic Pull */
+.magnetic-btn {
+  will-change: transform;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 5. 3D Shutter Flip for Avatar Transition */
+.avatar-inner {
+  perspective: 800px;
+}
+
+.avatar-inner img {
+  transform-style: preserve-3d;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.32s ease;
+}
+
+.avatar-inner.flipping img {
+  transform: rotateY(85deg) scale(0.92);
+  opacity: 0;
+}
+
+.photo-thumb-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.photo-thumb-btn.active {
+  border-color: var(--emerald-ultra) !important;
+  box-shadow: 0 0 16px rgba(0, 245, 160, 0.6) !important;
+  transform: scale(1.12);
 }
 
 /* ==========================================================================

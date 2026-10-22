@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initBackgroundCanvas();
   initCustomCursorAndRipples();
   initCardSpotlight();
+  initMagneticButtons();
+  initParallaxDepth();
   initTypingEffect();
   initAvatar3DTilt();
   initProjectCards3DTilt();
@@ -292,11 +294,40 @@ function initCustomCursorAndRipples() {
   let spotlightX = -100;
   let spotlightY = -100;
 
+  let lastTrailTime = 0;
   window.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
     dot.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
+
+    const now = performance.now();
+    if (now - lastTrailTime > 42 && !document.hidden && window.innerWidth >= 768) {
+      lastTrailTime = now;
+      createCometParticle(e.clientX, e.clientY);
+    }
   });
+
+  function createCometParticle(x, y) {
+    const p = document.createElement('div');
+    p.className = 'cursor-trail-particle';
+    const size = Math.random() * 4.5 + 2.5;
+    p.style.width = `${size}px`;
+    p.style.height = `${size}px`;
+    p.style.left = `${x + (Math.random() - 0.5) * 6}px`;
+    p.style.top = `${y + (Math.random() - 0.5) * 6}px`;
+
+    const colors = [
+      'rgba(0, 245, 160, 0.75)',
+      'rgba(6, 182, 212, 0.75)',
+      'rgba(52, 211, 153, 0.7)'
+    ];
+    const col = colors[Math.floor(Math.random() * colors.length)];
+    p.style.background = col;
+    p.style.boxShadow = `0 0 ${size * 2}px ${col}`;
+
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 700);
+  }
 
   function renderCursor() {
     ringX += (mouseX - ringX) * 0.18;
@@ -331,6 +362,7 @@ function initCustomCursorAndRipples() {
   // Click shockwave ripple & sparks
   document.addEventListener('click', (e) => {
     ring.classList.add('cursor-click');
+    playCyberTone('blip');
     setTimeout(() => ring.classList.remove('cursor-click'), 180);
 
     // Ripple
@@ -509,6 +541,8 @@ function initPhotoSwitcher() {
   let currentIndex = 0;
   let autoSlideTimer = null;
 
+  const avatarInner = document.querySelector('.avatar-inner');
+
   function switchPhoto(index) {
     if (index < 0 || index >= thumbBtns.length) return;
     currentIndex = index;
@@ -516,15 +550,13 @@ function initPhotoSwitcher() {
     const targetSrc = btn.getAttribute('data-img');
     if (!targetSrc) return;
 
-    mainImg.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
-    mainImg.style.opacity = '0';
-    mainImg.style.transform = 'scale(0.97)';
+    if (avatarInner) avatarInner.classList.add('flipping');
+    playCyberTone('whoosh');
 
     setTimeout(() => {
       mainImg.src = targetSrc;
-      mainImg.style.opacity = '1';
-      mainImg.style.transform = 'scale(1)';
-    }, 250);
+      if (avatarInner) avatarInner.classList.remove('flipping');
+    }, 180);
 
     thumbBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
@@ -590,24 +622,48 @@ function initPhotoSwitcher() {
 function initProjectFilters() {
   const filterBtns = document.querySelectorAll('.filter-btn');
   const cards = document.querySelectorAll('.project-card');
+  const pill = document.getElementById('filter-active-pill');
+
+  function updatePill(btn) {
+    if (!pill || !btn) return;
+    const bar = btn.parentElement;
+    const barRect = bar.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    const left = btnRect.left - barRect.left;
+    pill.style.width = `${btnRect.width}px`;
+    pill.style.transform = `translateX(${left}px)`;
+    pill.style.opacity = '1';
+  }
+
+  const activeBtn = document.querySelector('.filter-btn.active');
+  if (activeBtn) {
+    setTimeout(() => updatePill(activeBtn), 120);
+  }
 
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       filterBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      updatePill(btn);
+      playCyberTone('blip');
 
       const filter = btn.getAttribute('data-filter');
 
-      cards.forEach(card => {
+      cards.forEach((card, idx) => {
         const cat = card.getAttribute('data-category');
         if (filter === 'all' || cat === filter) {
           card.style.display = 'flex';
-          card.style.animation = 'fadeInUp 0.4s ease forwards';
+          card.style.animation = `fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) ${idx * 0.04}s forwards`;
         } else {
           card.style.display = 'none';
         }
       });
     });
+  });
+
+  window.addEventListener('resize', () => {
+    const current = document.querySelector('.filter-btn.active');
+    if (current) updatePill(current);
   });
 }
 
@@ -1035,6 +1091,44 @@ function initNavigationSpy() {
   const header = document.getElementById('site-header');
   const navLinks = document.querySelectorAll('.nav-item a');
   const sections = document.querySelectorAll('section');
+  const pill = document.getElementById('nav-active-pill');
+  const navContainer = document.getElementById('nav-links');
+
+  function updateNavPill(activeLink) {
+    if (!pill || !activeLink || !navContainer || window.innerWidth < 992) {
+      if (pill) pill.style.opacity = '0';
+      return;
+    }
+    const containerRect = navContainer.getBoundingClientRect();
+    const linkRect = activeLink.getBoundingClientRect();
+    const left = linkRect.left - containerRect.left;
+    pill.style.width = `${linkRect.width}px`;
+    pill.style.transform = `translateX(${left}px)`;
+    pill.style.opacity = '1';
+  }
+
+  // Initial positioning
+  const currentActive = document.querySelector('.nav-item a.active');
+  if (currentActive) {
+    setTimeout(() => updateNavPill(currentActive), 150);
+  }
+
+  // Hover fluid preview
+  navLinks.forEach(link => {
+    link.addEventListener('mouseenter', () => updateNavPill(link));
+  });
+
+  if (navContainer) {
+    navContainer.addEventListener('mouseleave', () => {
+      const active = document.querySelector('.nav-item a.active');
+      if (active) updateNavPill(active);
+    });
+  }
+
+  window.addEventListener('resize', () => {
+    const active = document.querySelector('.nav-item a.active');
+    if (active) updateNavPill(active);
+  });
 
   window.addEventListener('scroll', () => {
     const scrollPos = window.scrollY;
@@ -1058,13 +1152,16 @@ function initNavigationSpy() {
 
     if (currentId) {
       navLinks.forEach(link => {
-        link.classList.remove('active');
         if (link.getAttribute('href') === `#${currentId}`) {
-          link.classList.add('active');
+          if (!link.classList.contains('active')) {
+            navLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+            updateNavPill(link);
+          }
         }
       });
     }
-  });
+  }, { passive: true });
 }
 
 /* ==========================================================================
@@ -1279,3 +1376,137 @@ function initScrollRevealAndCounters() {
     skillsObserver.observe(skillsSection);
   }
 }
+
+/* ==========================================================================
+   18. Magnetic Pull on Interactive Buttons
+   ========================================================================== */
+function initMagneticButtons() {
+  if (window.innerWidth < 992) return;
+
+  const magneticTargets = document.querySelectorAll(
+    '.btn-primary, .btn-outline, .brand-logo, #theme-toggle-btn, #audio-toggle-btn, .back-to-top-btn, .photo-thumb-btn, .copy-mini-btn, .btn-project-link, .btn-project-secondary'
+  );
+
+  magneticTargets.forEach(el => {
+    el.classList.add('magnetic-btn');
+
+    el.addEventListener('mousemove', (e) => {
+      const rect = el.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const dx = e.clientX - centerX;
+      const dy = e.clientY - centerY;
+
+      el.style.transform = `translate(${dx * 0.28}px, ${dy * 0.28}px)`;
+    });
+
+    el.addEventListener('mouseleave', () => {
+      el.style.transform = 'translate(0px, 0px)';
+    });
+
+    el.addEventListener('mouseenter', () => {
+      playCyberTone('tick');
+    });
+  });
+}
+
+/* ==========================================================================
+   19. Multi-Layer Scroll Parallax Depth
+   ========================================================================== */
+function initParallaxDepth() {
+  const badge1 = document.querySelector('.float-badge-1');
+  const badge2 = document.querySelector('.float-badge-2');
+  const orb1 = document.querySelector('.ambient-orb-1');
+  const orb2 = document.querySelector('.ambient-orb-2');
+  const orb3 = document.querySelector('.ambient-orb-3');
+
+  let ticking = false;
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const scrolled = window.scrollY;
+
+        if (badge1) {
+          badge1.style.transform = `translateY(${Math.sin(scrolled * 0.004) * 8 - scrolled * 0.05}px) rotate(${Math.sin(scrolled * 0.003) * 2.5}deg)`;
+        }
+        if (badge2) {
+          badge2.style.transform = `translateY(${Math.cos(scrolled * 0.004) * 8 - scrolled * 0.06}px) rotate(${Math.cos(scrolled * 0.003) * -2.5}deg)`;
+        }
+        if (orb1) {
+          orb1.style.transform = `translate(0, ${scrolled * 0.12}px)`;
+        }
+        if (orb2) {
+          orb2.style.transform = `translate(0, ${scrolled * -0.1}px)`;
+        }
+        if (orb3) {
+          orb3.style.transform = `translate(0, ${scrolled * 0.08}px)`;
+        }
+
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+}
+
+/* ==========================================================================
+   20. Web Audio API Cyber Haptic Tone Synthesizer
+   ========================================================================== */
+let audioCtx = null;
+
+function getAudioContext() {
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) {
+      audioCtx = new AudioContextClass();
+    }
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+function playCyberTone(type = 'tick') {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    const now = ctx.currentTime;
+
+    if (type === 'tick') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1200, now);
+      osc.frequency.exponentialRampToValueAtTime(750, now + 0.012);
+      gain.gain.setValueAtTime(0.015, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
+      osc.start(now);
+      osc.stop(now + 0.012);
+    } else if (type === 'blip') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(600, now);
+      osc.frequency.exponentialRampToValueAtTime(1250, now + 0.022);
+      gain.gain.setValueAtTime(0.022, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.022);
+      osc.start(now);
+      osc.stop(now + 0.022);
+    } else if (type === 'whoosh') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(320, now);
+      osc.frequency.exponentialRampToValueAtTime(680, now + 0.038);
+      gain.gain.setValueAtTime(0.018, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.038);
+      osc.start(now);
+      osc.stop(now + 0.038);
+    }
+  } catch (err) {
+    // Silently continue if autoplay policies apply
+  }
+}
+
