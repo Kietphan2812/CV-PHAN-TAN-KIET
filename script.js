@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTypingEffect();
   initAvatar3DTilt();
   initProjectCards3DTilt();
+  initHero3DWebGL();
   initPhotoSwitcher();
   initProjectFilters();
   initProjectModals();
@@ -567,7 +568,7 @@ function initTypingEffect() {
 }
 
 /* ==========================================================================
-   5. Holographic 3D Tilt on Avatar Card
+   5. Holographic 3D Tilt on Avatar Card (High-Intensity 3D Perspective)
    ========================================================================== */
 function initAvatar3DTilt() {
   const card = document.getElementById('avatar-card');
@@ -581,10 +582,11 @@ function initAvatar3DTilt() {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const rotateX = ((y - centerY) / centerY) * -12;
-    const rotateY = ((x - centerX) / centerX) * 12;
+    const rotateX = ((y - centerY) / centerY) * -18;
+    const rotateY = ((x - centerX) / centerX) * 18;
 
-    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+    card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-10px)`;
+    card.style.boxShadow = `${(-rotateY * 2.8).toFixed(1)}px ${(rotateX * 2.8).toFixed(1)}px 50px rgba(0, 0, 0, 0.65), 0 0 35px rgba(0, 245, 160, 0.35)`;
 
     if (glare) {
       const glareX = (x / rect.width) * 100;
@@ -596,17 +598,18 @@ function initAvatar3DTilt() {
 
   card.addEventListener('mouseleave', () => {
     card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+    card.style.boxShadow = '';
   });
 }
 
 /* ==========================================================================
-   6. 3D Perspective Tilt for Project Cards
+   6. 3D Perspective Tilt for Project Cards & Interactive UI Blocks
    ========================================================================== */
 function initProjectCards3DTilt() {
   if (window.innerWidth < 992) return;
-  const projectCards = document.querySelectorAll('.project-card');
+  const cards = document.querySelectorAll('.project-card, .skill-category-card, .timeline-card, .terminal-window');
 
-  projectCards.forEach(card => {
+  cards.forEach(card => {
     card.addEventListener('mousemove', (e) => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -614,14 +617,19 @@ function initProjectCards3DTilt() {
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
 
-      const rotateX = ((y - centerY) / centerY) * -5;
-      const rotateY = ((x - centerX) / centerX) * 5;
+      const isLarge = card.classList.contains('terminal-window') || card.classList.contains('project-card');
+      const maxAngle = isLarge ? 15 : 12;
 
-      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+      const rotateX = ((y - centerY) / centerY) * -maxAngle;
+      const rotateY = ((x - centerX) / centerX) * maxAngle;
+
+      card.style.transform = `perspective(1100px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-8px)`;
+      card.style.boxShadow = `${(-rotateY * 2.2).toFixed(1)}px ${(rotateX * 2.2).toFixed(1)}px 42px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 245, 160, 0.28)`;
     });
 
     card.addEventListener('mouseleave', () => {
-      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+      card.style.transform = 'perspective(1100px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+      card.style.boxShadow = '';
     });
   });
 }
@@ -1780,5 +1788,245 @@ function initSmoothInertiaScroll() {
       currentY = window.scrollY;
     }
   }, { passive: true });
+}
+
+/* ==========================================================================
+   25. Interactive 3D WebGL Holographic Lab (Three.js Powered)
+   ========================================================================== */
+function initHero3DWebGL() {
+  const canvas = document.getElementById('hero-3d-canvas');
+  const container = document.getElementById('holo-canvas-wrapper');
+  const switchBtn = document.getElementById('holo-switch-shape-btn');
+  const shapeNameEl = document.getElementById('holo-shape-name');
+
+  if (!canvas || !container || typeof THREE === 'undefined') return;
+
+  const width = container.clientWidth || 380;
+  const height = container.clientHeight || 195;
+
+  // Scene & Camera
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+  camera.position.z = 7.5;
+
+  // Renderer with alpha transparency & high performance
+  const renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    alpha: true,
+    antialias: true,
+    powerPreference: 'high-performance'
+  });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  // Lights
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+  scene.add(ambientLight);
+
+  const dirLight1 = new THREE.DirectionalLight(0x00f5a0, 1.8);
+  dirLight1.position.set(5, 5, 5);
+  scene.add(dirLight1);
+
+  const dirLight2 = new THREE.DirectionalLight(0x06b6d4, 1.5);
+  dirLight2.position.set(-5, -5, 3);
+  scene.add(dirLight2);
+
+  // Group for the 3D Hologram Core
+  const coreGroup = new THREE.Group();
+  scene.add(coreGroup);
+
+  // 3 Geometries: Torus Knot, Icosahedron, Tech Box
+  const geometries = [
+    {
+      name: 'Torus Knot 3D',
+      geom: new THREE.TorusKnotGeometry(1.5, 0.42, 100, 16)
+    },
+    {
+      name: 'Cyber Icosahedron',
+      geom: new THREE.IcosahedronGeometry(2.1, 1)
+    },
+    {
+      name: 'Matrix Tech Cube',
+      geom: new THREE.BoxGeometry(2.4, 2.4, 2.4, 3, 3, 3)
+    }
+  ];
+
+  let currentGeomIndex = 0;
+
+  // Materials
+  const wireMaterial = new THREE.MeshBasicMaterial({
+    color: 0x00f5a0,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.85
+  });
+
+  const solidMaterial = new THREE.MeshStandardMaterial({
+    color: 0x06b6d4,
+    roughness: 0.25,
+    metalness: 0.85,
+    transparent: true,
+    opacity: 0.45,
+    wireframe: false
+  });
+
+  let wireMesh = new THREE.Mesh(geometries[0].geom, wireMaterial);
+  let solidMesh = new THREE.Mesh(geometries[0].geom, solidMaterial);
+  solidMesh.scale.set(0.96, 0.96, 0.96);
+
+  coreGroup.add(solidMesh);
+  coreGroup.add(wireMesh);
+
+  // Orbiting Quantum Particle Ring
+  const particleCount = 320;
+  const particleGeom = new THREE.BufferGeometry();
+  const particlePositions = new Float32Array(particleCount * 3);
+
+  for (let i = 0; i < particleCount; i++) {
+    const radius = 3.2 + (Math.random() - 0.5) * 1.2;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = (Math.random() - 0.5) * Math.PI * 0.7;
+
+    particlePositions[i * 3] = radius * Math.cos(theta) * Math.cos(phi);
+    particlePositions[i * 3 + 1] = radius * Math.sin(phi);
+    particlePositions[i * 3 + 2] = radius * Math.sin(theta) * Math.cos(phi);
+  }
+
+  particleGeom.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+
+  const particleMaterial = new THREE.PointsMaterial({
+    color: 0x34d399,
+    size: 0.065,
+    transparent: true,
+    opacity: 0.75
+  });
+
+  const particleCloud = new THREE.Points(particleGeom, particleMaterial);
+  coreGroup.add(particleCloud);
+
+  // Interactive Mouse Dragging & Orbiting
+  let isDragging = false;
+  let previousMousePosition = { x: 0, y: 0 };
+  let targetRotation = { x: 0, y: 0 };
+
+  container.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    previousMousePosition = { x: e.clientX, y: e.clientY };
+  });
+
+  window.addEventListener('mouseup', () => {
+    isDragging = false;
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (isDragging) {
+      const deltaX = e.clientX - previousMousePosition.x;
+      const deltaY = e.clientY - previousMousePosition.y;
+
+      coreGroup.rotation.y += deltaX * 0.012;
+      coreGroup.rotation.x += deltaY * 0.012;
+
+      previousMousePosition = { x: e.clientX, y: e.clientY };
+    } else {
+      // Subtle mouse tracking
+      const rect = container.getBoundingClientRect();
+      const relX = (e.clientX - rect.left) / rect.width - 0.5;
+      const relY = (e.clientY - rect.top) / rect.height - 0.5;
+      targetRotation.y = relX * 0.8;
+      targetRotation.x = relY * 0.8;
+    }
+  });
+
+  // Touch Dragging for Mobile
+  container.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      isDragging = true;
+      previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchend', () => {
+    isDragging = false;
+  });
+
+  window.addEventListener('touchmove', (e) => {
+    if (isDragging && e.touches.length === 1) {
+      const deltaX = e.touches[0].clientX - previousMousePosition.x;
+      const deltaY = e.touches[0].clientY - previousMousePosition.y;
+
+      coreGroup.rotation.y += deltaX * 0.015;
+      coreGroup.rotation.x += deltaY * 0.015;
+
+      previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+  }, { passive: true });
+
+  // Shape Switcher Handler
+  if (switchBtn) {
+    switchBtn.addEventListener('click', () => {
+      currentGeomIndex = (currentGeomIndex + 1) % geometries.length;
+      const nextGeom = geometries[currentGeomIndex];
+
+      // Shrink scale out then scale back in
+      let scale = 1;
+      const shrinkInterval = setInterval(() => {
+        scale -= 0.15;
+        if (scale <= 0.2) {
+          clearInterval(shrinkInterval);
+          wireMesh.geometry = nextGeom.geom;
+          solidMesh.geometry = nextGeom.geom;
+          if (shapeNameEl) shapeNameEl.textContent = nextGeom.name;
+          playCyberTone('whoosh');
+
+          const growInterval = setInterval(() => {
+            scale += 0.15;
+            coreGroup.scale.set(scale, scale, scale);
+            if (scale >= 1) {
+              coreGroup.scale.set(1, 1, 1);
+              clearInterval(growInterval);
+            }
+          }, 16);
+        } else {
+          coreGroup.scale.set(scale, scale, scale);
+        }
+      }, 16);
+    });
+  }
+
+  // Responsive Resize
+  function onResize() {
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    if (w === 0 || h === 0) return;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  }
+  window.addEventListener('resize', onResize);
+
+  // Animation Loop
+  let clock = new THREE.Clock();
+
+  function animate3D() {
+    requestAnimationFrame(animate3D);
+
+    // Auto spin when not manually dragging
+    if (!isDragging) {
+      coreGroup.rotation.y += 0.008;
+      coreGroup.rotation.x += 0.004;
+
+      // Smooth inertia towards cursor
+      coreGroup.rotation.y += (targetRotation.y - (coreGroup.rotation.y % (Math.PI * 2))) * 0.03;
+      coreGroup.rotation.x += (targetRotation.x - (coreGroup.rotation.x % (Math.PI * 2))) * 0.03;
+    }
+
+    // Spin particle halo in opposite direction
+    particleCloud.rotation.y -= 0.005;
+    particleCloud.rotation.z += 0.003;
+
+    renderer.render(scene, camera);
+  }
+
+  animate3D();
 }
 
